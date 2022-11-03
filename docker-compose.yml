@@ -1,0 +1,44 @@
+version: '3.9'
+networks:
+  wp-network:
+    name: wp-network
+    driver: bridge
+    
+volumes:
+  db_data:
+    driver: local
+    name: db
+    driver_opts:
+      type: none
+      o: bind
+      device: F:/db
+  wp_content:
+    driver: local
+    name: wp
+    driver_opts:
+      type: none
+      o: bind
+      device: F:/wp
+
+services:
+  db:
+    image: mysql:latest
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    env_file: .env
+    networks:
+    - wp-network
+    expose:
+      - 3306
+  wordpress:
+    image: wordpress:latest
+    volumes:
+      - wp_content:/var/www/html/wp-content
+    networks:
+    - wp-network
+    ports:
+      - 8080:80
+    restart: always
+    env_file: .env
+
